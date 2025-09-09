@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Form, File, UploadFile
+from fastapi import FastAPI
+from db import adverts_collection
+from utils import replace_advert_id
 
     
-app = FastAPI(
-    title="A Complete Advertisement Management Platform API",
-    description="A basic backend for an e-commerce platform with product and order management."
-    )
+app = FastAPI()
 
 
 @app.get(
@@ -12,5 +11,8 @@ app = FastAPI(
     tags= ["Ads"],
     summary= "Get all adverts"
     )
+
+
 def get_adverts():
-    return list(advert_created)
+    all_adverts = adverts_collection.find().to_list()
+    return {"adverts": list(map(replace_advert_id, all_adverts))}

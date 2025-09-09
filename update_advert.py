@@ -1,13 +1,19 @@
-from fastapi import FastAPI, HTTPException, Form, File, UploadFile
+from fastapi import FastAPI, HTTPException, Form, File, UploadFile, status
 from db import adverts_collection
 from bson.objectid import ObjectId
-from bson.errors import InvalidId
 from typing import Annotated
-from utils import replace_advert_id
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name="dwlcmfaxi",
+    api_key="453953172262744",
+    api_secret="aQ7PWP7XnvGBlHJ5O0BRL07Xvec"
+)
 
 app = FastAPI()
 
-@app.patch("/adverts/{advert_id}")
+@app.put("/adverts/{advert_id}")
 def update_advert_by_id(
     advert_id: str,
     title: Annotated[str, Form()],
@@ -15,33 +21,20 @@ def update_advert_by_id(
     flyer: Annotated[UploadFile, File()],
     category: Annotated[str, Form()],
     price: Annotated[float, Form()]):
-    try:
-        advert_object_id = ObjectId(advert_id)
-    except InvalidId:
-        raise HTTPException(status_code=400, detail="Invalid ID format")
+    if not ObjectId.is_valid(advert_id):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid ID format")
     
-    update_fields = {}
-    if title:
-        update_fields["title"] = title
-    if description:
-        update_fields["description"] = description
-    if category:
-        update_fields["category"] = category
-    if price:
-        update_fields["price"] = price
-    if flyer:
-        update_fields["flyer"] = flyer
-
-    updated_advert_result = adverts_collection.update_one(
-        {"_id": advert_object_id},
-        {"$set": update_fields}
-    )
-
-    if updated_advert_result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Advert not found")
     
-    updated_advert = adverts_collection.find_one({"_id": advert_object_id})
+    
+    upload_result = cloudinary.uploader.upload(flyer.file)
+    adverts_collection.replace_one(
+        filter={"_id": ObjectId(advert_id)},
+        replacement={
+            "title": title,
+            "description": description,
+            "flyer": upload_result["secure_url"],
+            "category": category,
+            "price": price
+        })
 
-    return {"message": f"Advert {advert_id} updated successfully",
-            "advert": replace_advert_id(updated_advert)
-            }
+    return {"message": f"Advert {advert_id} updated successfully"}
