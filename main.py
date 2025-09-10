@@ -9,16 +9,15 @@ app = FastAPI(
     title="A Complete Advertisement Management Platform API",
     description="A basic backend for an e-commerce platform with product and order management."
 )
-app.get("/")
+@app.get("/")
 def get_home():
     return {"message": "Welcome to our Advert API"}
 
-app.get("/")
-def get_home():
-    return {"message": "Welcome to our Advert API"}
+
+
 
 app.get("/adverts")(get_adverts)
 app.get("/adverts/{advert_id}")(get_advert_by_id)
 app.post("/adverts")(create_advert)
 app.put("/adverts/{advert_id}")(update_advert_by_id)
-app.delete("/advert/{advert_id}")(delete_advert)
+app.delete("/adverts/{advert_id}")(delete_advert)
