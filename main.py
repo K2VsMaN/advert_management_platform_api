@@ -9,6 +9,10 @@ app = FastAPI(
     title="A Complete Advertisement Management Platform API",
     description="A basic backend for an e-commerce platform with product and order management."
 )
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2f093f25c1509a866fe17f731cb1209848aeac5
 @app.get("/")
 def get_home():
     return {"message": "Welcome to our Advert API"}
