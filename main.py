@@ -10,7 +10,7 @@ app = FastAPI(
     description="A basic backend for an e-commerce platform with product and order management."
 )
 
-app.get("/")
+@app.get("/")
 def get_home():
     return {"message": "Welcome to our Advert API"}
 
