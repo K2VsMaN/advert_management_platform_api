@@ -10,6 +10,10 @@ app = FastAPI(
     description="A basic backend for an e-commerce platform with product and order management."
 )
 
+app.get("/")
+def get_home():
+    return {"message": "Welcome to our Advert API"}
+
 app.get("/adverts")(get_adverts)
 app.get("/adverts/{advert_id}")(get_advert_by_id)
 app.post("/adverts")(create_advert)
