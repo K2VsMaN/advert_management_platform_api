@@ -13,6 +13,20 @@ app = FastAPI()
     )
 
 
-def get_adverts():
-    all_adverts = adverts_collection.find().to_list()
+def get_adverts(
+    title="",
+    description="",
+    limit=10,
+    skip=0
+):
+    all_adverts = adverts_collection.find(
+        filter={
+            "$or": [
+                {"title": {"$regex": title, "$options": "i"}},
+                {"description": {"$regex": description, "$options": "i"}},
+            ]
+        },
+        limit=int(limit),
+        skip=int(skip),
+    ).to_list()
     return {"adverts": list(map(replace_advert_id, all_adverts))}

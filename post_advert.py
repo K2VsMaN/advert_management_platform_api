@@ -1,11 +1,21 @@
-from fastapi import FastAPI, Form, File, UploadFile
+from fastapi import  Form, File, UploadFile
 from db import adverts_collection
 from typing import Annotated
 from datetime import date, time
+import os
+from dotenv import load_dotenv
+import cloudinary
+import cloudinary.uploader
 
-app = FastAPI()
+load_dotenv()
 
-@app.post("/adverts")
+cloudinary.config(
+    cloud_name = os.getenv("CLOUD_NAME"),
+    api_key = os.getenv("API_KEY"),
+    api_secret = os.getenv("API_SECRET"),
+    )
+
+
 def create_advert(
     title: Annotated[str, Form()],
     description: Annotated[str, Form()],
@@ -16,18 +26,18 @@ def create_advert(
     start_time: Annotated[time, Form(...)],
     end_time: Annotated[time, Form(...)]):
 
-
+    upload_result = cloudinary.uploader.upload(flyer.file)
     advert_created = {
         "title": title,
         "description": description,
-        "flyer": flyer.filename,
+        "flyer": upload_result["secure_url"],
         "category": category,
         "price": price,
         "advert_date": str(advert_date),
         "start_time": start_time.replace(tzinfo=None).isoformat(),
         "end_time": end_time.replace(tzinfo=None).isoformat()
     }
-
+    
     advert_result = adverts_collection.insert_one(advert_created)
 
     return {
