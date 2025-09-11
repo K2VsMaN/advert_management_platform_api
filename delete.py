@@ -1,15 +1,8 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import HTTPException, status
 from bson.objectid import ObjectId
 from db import adverts_collection
 
-app = FastAPI()
 
-
-@app.delete(
-    "/adverts/{advert_id}",
-    tags=["Delete"],
-    summary="Delete an ad",
-)
 def delete_advert(advert_id):
     if not ObjectId.is_valid(advert_id):
         raise HTTPException(
