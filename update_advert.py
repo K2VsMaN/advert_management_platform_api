@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from typing import Annotated
 import cloudinary
 import cloudinary.uploader
+from datetime import date, time
 
 cloudinary.config(
     cloud_name="dwlcmfaxi",
@@ -20,7 +21,10 @@ def update_advert_by_id(
     description: Annotated[str, Form()],
     flyer: Annotated[UploadFile, File()],
     category: Annotated[str, Form()],
-    price: Annotated[float, Form()]):
+    price: Annotated[float, Form()],
+    advert_date: Annotated[date, Form(...)],
+    start_time: Annotated[time, Form(...)],
+    end_time: Annotated[time, Form(...)]):
     if not ObjectId.is_valid(advert_id):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid ID format")
     
@@ -34,7 +38,10 @@ def update_advert_by_id(
             "description": description,
             "flyer": upload_result["secure_url"],
             "category": category,
-            "price": price
+            "price": price,
+            "advert_date": str(advert_date),
+            "start_time": start_time.replace(tzinfo=None).isoformat(),
+            "end_time": end_time.replace(tzinfo=None).isoformat()
         })
 
     return {"message": f"Advert {advert_id} updated successfully"}
