@@ -15,3 +15,4 @@ advert_management_db = mongo_client["advert_management_db"]
 
 # Pick a connection to operate on
 adverts_collection = advert_management_db["adverts"]
+users_collection = advert_management_db["users"]
