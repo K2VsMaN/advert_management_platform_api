@@ -1,9 +1,17 @@
 from fastapi import FastAPI
-from post_advert import create_advert
-from update_advert import update_advert_by_id
-from all_adverts import get_adverts
-from advert_details import get_advert_by_id
-from delete import delete_advert
+from routes.adverts import adverts_router 
+import os
+from dotenv import load_dotenv
+import cloudinary
+from routes.users import users_router
+
+load_dotenv()
+
+cloudinary.config(
+    cloud_name = os.getenv("CLOUD_NAME"),
+    api_key = os.getenv("API_KEY"),
+    api_secret = os.getenv("API_SECRET"),
+    )
 
 app = FastAPI(
     title="A Complete Advertisement Management Platform API",
@@ -14,8 +22,5 @@ app = FastAPI(
 def get_home():
     return {"message": "Welcome to our Advert API"}
 
-app.get("/adverts")(get_adverts)
-app.get("/adverts/{advert_id}")(get_advert_by_id)
-app.post("/adverts")(create_advert)
-app.put("/adverts/{advert_id}")(update_advert_by_id)
-app.delete("/adverts/{advert_id}")(delete_advert)
+app.include_router(adverts_router)
+app.include_router(users_router)
