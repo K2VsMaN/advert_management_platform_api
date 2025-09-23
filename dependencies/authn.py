@@ -16,7 +16,6 @@ def is_authenticated(
             key= os.getenv("JWT_SECRET_KEY"),
             algorithms=os.getenv("JWT_ALGORITHM")
         )
-        print (payload)
         return payload["id"]
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))

@@ -9,7 +9,7 @@ from datetime import date, time
 import cloudinary.uploader
 from dependencies.authn import is_authenticated
 from dependencies.authz import has_role
-from services.ai_service import generate_related_adverts, price_suggestion
+# from services.ai_service import generate_related_adverts, price_suggestion
 
 
 adverts_router = APIRouter(tags=["Adverts"])
@@ -86,8 +86,7 @@ def create_advert(
     return {
         "message": "Advert created successfully",
         "advert_id": str(advert_result.inserted_id),
-        "description": generate_related_adverts(title),
-        "description": price_suggestion
+        "description": description
         }
 
 
