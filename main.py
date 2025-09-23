@@ -1,9 +1,9 @@
-from fastapi import FastAPI
-from routes.adverts import adverts_router 
+from fastapi import FastAPI 
 import os
 from dotenv import load_dotenv
 import cloudinary
 from routes.users import users_router
+from routes.adverts import adverts_router
 
 load_dotenv()
 
@@ -17,6 +17,7 @@ app = FastAPI(
     title="A Complete Advertisement Management Platform API",
     description="A basic backend for an e-commerce platform with product and order management."
 )
+
 
 @app.get("/")
 def get_home():
