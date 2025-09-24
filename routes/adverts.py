@@ -70,7 +70,7 @@ def get_related_adverts(event_id, limit=10, skip= 0):
     return {"data": list(map(replace_advert_id, similar_events))}
 
 
-@adverts_router.get("/adverts/user/me", tags=["Vendor Dashboard"], dependencies=[Depends(has_role("vendor"))])
+@adverts_router.get("/adverts/user/me", dependencies=[Depends(has_role("vendor"))])
 def get_my_adverts(user_id: Annotated[str, Depends(is_authenticated)]):
     # Use the userID string dirctly in the database query.
     adverts_cursor = adverts_collection.find(filter={"owner": user_id})
@@ -90,7 +90,8 @@ def create_advert(
     advert_date: Annotated[date, Form(...)],
     start_time: Annotated[time, Form(...)],
     end_time: Annotated[time, Form(...)],
-    user_id: Annotated[str, Depends(is_authenticated)]
+    user_id: Annotated[str, Depends(is_authenticated)],
+    location: Annotated[str, Form()]
     ):
     # Ensure an advert with title and vendor_id combined does not exist
     advert_count = adverts_collection.count_documents(filter={"$and":[
@@ -110,7 +111,8 @@ def create_advert(
         "advert_date": str(advert_date),
         "start_time": start_time.replace(tzinfo=None).isoformat(),
         "end_time": end_time.replace(tzinfo=None).isoformat(),
-        "owner": user_id
+        "owner": user_id,
+        "location": location
     }
     
     advert_result = adverts_collection.insert_one(advert_created)
