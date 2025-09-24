@@ -16,7 +16,7 @@ adverts_router = APIRouter(tags=["Adverts"])
 
 
 @adverts_router.get(
-    "/adverts/",
+    "/adverts",
     summary="Get all adverts"
 )
 def get_adverts(
@@ -48,36 +48,36 @@ def get_advert_by_id(advert_id):
     return {"data": replace_advert_id(advert)}
 
 
-@adverts_router.get("/events/{event_id}/related_adverts")
-def get_related_adverts(event_id, limit=10, skip=0):
-    # Check if event id is valid
-    if not ObjectId.is_valid(event_id):
+@adverts_router.get("/adverts/{advert_id}/related_adverts")
+def get_related_adverts(advert_id, limit=10, skip=0):
+    # Check if advert id is valid
+    if not ObjectId.is_valid(advert_id):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid mongo id received!")
-    # Get all events from database by id
-    event = adverts_collection.find_one({"_id": ObjectId(event_id)})
-    if not event:
+    # Get all adverts from database by id
+    advert = adverts_collection.find_one({"_id": ObjectId(advert_id)})
+    if not advert:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Event not found!")
-    # Get similar event in the database
-    similar_events = adverts_collection.find(
+            status_code=status.HTTP_404_NOT_FOUND, detail="advert not found!")
+    # Get similar advert in the database
+    similar_adverts = adverts_collection.find(
         filter={
             "$or": [
-                {"title": {"$regex": event["title"], "$options": "i"}},
+                {"title": {"$regex": advert["title"], "$options": "i"}},
                 {"description": {
-                    "$regex": event["description"], "$options": "i"}}
+                    "$regex": advert["description"], "$options": "i"}}
             ]},
         limit=int(limit),
         skip=int(skip)
     ).to_list()
     # Return response
-    return {"data": list(map(replace_advert_id, similar_events))}
+    return {"data": list(map(replace_advert_id, similar_adverts))}
 
 
-@adverts_router.get("/adverts/user/me", dependencies=[Depends(has_role("vendor"))])
-def get_my_adverts(user_id: Annotated[str, Depends(is_authenticated)]):
-    # Use the userID string dirctly in the database query.
-    adverts_cursor = adverts_collection.find(filter={"owner": user_id})
+@adverts_router.get("/adverts/vendor/me", dependencies=[Depends(has_role("vendor"))])
+def get_my_adverts(vendor_id: Annotated[str, Depends(is_authenticated)]):
+    # Use the vendorID string dirctly in the database query.
+    adverts_cursor = adverts_collection.find(filter={"owner": vendor_id})
 
     advert_list = list(adverts_cursor)
 
@@ -128,7 +128,7 @@ def create_advert(
         "advert_date": str(advert_date),
         "start_time": start_time.replace(tzinfo=None).isoformat(),
         "end_time": end_time.replace(tzinfo=None).isoformat(),
-        "owner": user_id,
+        "owner": vendor_id,
         "location": location
     }
 
@@ -150,7 +150,7 @@ def update_advert_by_id(
         advert_date: Annotated[date, Form(...)],
         start_time: Annotated[time, Form(...)],
         end_time: Annotated[time, Form(...)],
-        user_id: Annotated[str, Depends(is_authenticated)],
+        vendor_id: Annotated[str, Depends(is_authenticated)],
         location: Annotated[str, Form()],
         flyer: Annotated[bytes, File()] = None,
         description: Annotated[str, Form()] = None,
@@ -172,7 +172,7 @@ def update_advert_by_id(
 
     upload_result = cloudinary.uploader.upload(flyer)
     replace_result = adverts_collection.replace_one(
-        filter={"_id": ObjectId(advert_id), "owner": user_id},
+        filter={"_id": ObjectId(advert_id), "owner": vendor_id},
         replacement={
             "title": title,
             "description": description,
@@ -191,13 +191,13 @@ def update_advert_by_id(
 
 
 @adverts_router.delete("/adverts/{advert_id}", summary="Delete an advert", dependencies=[Depends(has_role("vendor"))])
-def delete_advert(advert_id, user_id: Annotated[str, Depends(is_authenticated)]):
+def delete_advert(advert_id, vendor_id: Annotated[str, Depends(is_authenticated)]):
     if not ObjectId.is_valid(advert_id):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid mongo id received")
-    # Delete event from database
+    # Delete advert from database
     delete_result = adverts_collection.delete_one(
-        filter={"_id": ObjectId(advert_id), "owner": user_id})
+        filter={"_id": ObjectId(advert_id), "owner": vendor_id})
     if not delete_result:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid mongo id received")
