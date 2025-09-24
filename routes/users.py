@@ -69,7 +69,7 @@ def login_user(
 
     encoded_jwt = jwt.encode({
             "id": str(user["_id"]),
-            "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=30)
+            "exp": datetime.now(tz=timezone.utc) + timedelta(minutes=60)
         }, os.getenv("JWT_SECRET_KEY"), os.getenv("JWT_ALGORITHM"))
 
     return {

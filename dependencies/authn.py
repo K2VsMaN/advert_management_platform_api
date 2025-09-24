@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
-from db import adverts_collection
+from db import users_collection
 from utils import replace_advert_id
 from bson.objectid import ObjectId
 
@@ -20,11 +20,11 @@ def is_authenticated(
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
     
-def authenticated_vendor(vendor_id: Annotated[str,Depends(is_authenticated)]):
-    vendor = adverts_collection.find_one(filter={"id": ObjectId(vendor_id)})
-    if not vendor:
+def authenticated_user(user_id: Annotated[str,Depends(is_authenticated)]):
+    user = users_collection.find_one(filter={"_id": ObjectId(user_id)})
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authenticated vendor missing from database!"
         )
-    return replace_advert_id(vendor)
+    return replace_advert_id(user)
