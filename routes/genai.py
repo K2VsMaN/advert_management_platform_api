@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends
 from typing import Annotated
 from dependencies.authn import is_authenticated
 from utils import genai_client
-from google.genai import types
+
 
 # Create genai router
 genai_router = APIRouter(tags=["GenAI"])
