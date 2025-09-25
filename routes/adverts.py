@@ -17,7 +17,7 @@ adverts_router = APIRouter(tags=["Adverts"])
 
 
 @adverts_router.get(
-    "/adverts/",
+    "/adverts",
     summary="Get all adverts"
 )
 def get_adverts(
@@ -63,11 +63,12 @@ def get_related_adverts(advert_id, limit=10, skip= 0):
         filter={
             "$or": [
                 {"title": {"$regex": advert["title"], "$options": "i"}},
-                {"description": {"$regex": advert["description"], "$options": "i"}}
+                {"description": {"$regex": advert["description"], "$options": "i"}},
+                {"category": {"$regex": advert["category"], "$options": "i"}}
         ]},
         limit= int(limit),
         skip= int(skip)
-    ).to_list()
+).to_list() 
     # Return response
     return {"data": list(map(replace_advert_id, similar_adverts))}
 
