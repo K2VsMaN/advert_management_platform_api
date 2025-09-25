@@ -94,7 +94,7 @@ def create_advert(
     end_time: Annotated[time, Form(...)],
     vendor_id: Annotated[str, Depends(is_authenticated)],
     description: Annotated[str, Form()] = None,
-    flyer: Annotated[UploadFile, File()] = None,
+    flyer: Annotated[bytes, File()] = None,
     ):
     # Ensure an advert with title and vendor_id combined does not exist
     advert_count = adverts_collection.count_documents(filter={"$and":[
@@ -151,14 +151,14 @@ def update_advert_by_id(
         end_time: Annotated[time, Form(...)],
         vendor_id: Annotated[str, Depends(is_authenticated)],
         description: Annotated[str, Form()] = None,
-        flyer: Annotated[UploadFile, File()] = None,
+        flyer: Annotated[bytes, File()] = None,
         ):
     if not ObjectId.is_valid(advert_id):
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid ID format")
     
     if not flyer:
-        # Generate AI image with Hugging face
+        # Generate AI image with Gemini
         response = genai_client.models.generate_images(
             model='imagen-4.0-generate-001',
             prompt=title,
