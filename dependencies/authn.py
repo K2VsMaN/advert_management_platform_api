@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from db import users_collection
-from utils import replace_advert_id
+from utils import replace_user_id
 from bson.objectid import ObjectId
 
 def is_authenticated(
@@ -25,6 +25,6 @@ def authenticated_user(user_id: Annotated[str,Depends(is_authenticated)]):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authenticated vendor missing from database!"
+            detail="Authenticated user missing from database!"
         )
-    return replace_advert_id(user)
+    return replace_user_id(user)
