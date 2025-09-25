@@ -24,6 +24,6 @@ app = FastAPI(
 def get_home():
     return {"message": "Welcome to our Advert API"}
 
-app.include_router(adverts_router)
+app.include_router(adverts_router, tags=["Adverts"])
 app.include_router(users_router)
 app.include_router(genai_router)
