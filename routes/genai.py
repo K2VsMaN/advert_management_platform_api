@@ -12,8 +12,7 @@ genai_router = APIRouter(tags=["GenAI"])
 def generate_text(prompt: Annotated[str, Form()]):
     response = genai_client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig()
+        contents=prompt
     )
     return {
         "content": response.text
