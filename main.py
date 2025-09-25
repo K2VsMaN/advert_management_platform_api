@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import cloudinary
 from routes.users import users_router
 from routes.adverts import adverts_router
-from routes.genai import genai_router
 
 load_dotenv()
 
@@ -24,9 +23,5 @@ app = FastAPI(
 def get_home():
     return {"message": "Welcome to our Advert API"}
 
-
-
 app.include_router(adverts_router)
 app.include_router(users_router)
-app.include_router(genai_router)
-
