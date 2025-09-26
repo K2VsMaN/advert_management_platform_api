@@ -76,7 +76,7 @@ def get_related_adverts(advert_id, limit=10, skip=0):
     return {"data": list(map(replace_advert_id, similar_adverts))}
 
 
-@adverts_router.get("/adverts/vendor/me", tags=["Vendor Dashboard"], dependencies=[Depends(has_role("vendor"))])
+@adverts_router.get("/adverts/vendor/me", dependencies=[Depends(has_role("vendor"))])
 def get_my_adverts(vendor_id: Annotated[str, Depends(is_authenticated)]):
     # Use the vendorID string dirctly in the database query.
     adverts_cursor = adverts_collection.find(filter={"owner": vendor_id})

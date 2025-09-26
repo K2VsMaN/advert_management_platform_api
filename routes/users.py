@@ -74,5 +74,6 @@ def login_user(
 
     return {
         "message": "Login successful",
-        "access_token": encoded_jwt
+        "access_token": encoded_jwt,
+        "role": user["role"]
     }
